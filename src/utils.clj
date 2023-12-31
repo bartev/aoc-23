@@ -1,7 +1,8 @@
 (ns utils
   (:require
    [babashka.fs :as fs]
-   [clojure.java.io :as io]))
+   [clojure.java.io :as io]
+   [clojure.string :as str]))
 
 (defn get-local-fname
   "Get the full filename when in same dir as this file."
@@ -24,7 +25,12 @@
   (with-open [reader (io/reader fname)]
     (doall (line-seq reader))))
 
-
+;; Could also do this with `slurp`
+(defn read-file-lines-slurp
+  "Read a file using slurp"
+  [fname]
+  (->> (slurp (get-local-fname fname))
+       str/split-lines))
 (defn get-local-fname
   "Get fname relative to source file."
   [fname]

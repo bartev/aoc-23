@@ -16,8 +16,8 @@
 (deftest sum-calib-data-live-test
   (is (= 54877 (sum-calib-data fname-live))))
 
-(deftest string->num-test
-  (is (= "8y135" (string->num "eightyone3five"))))
+#_(deftest string->num-test
+    (is (= "8y135" (string->num "eightyone3five"))))
 
 #_(deftest string->num->extract-test
     (is (= 85 (string->num->extract "eightone3five"))))

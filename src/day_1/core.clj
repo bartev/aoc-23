@@ -6,6 +6,7 @@
    [utils :refer [get-local-fname
                   read-file-lines]]))
 
+;; I made this extra complicated!
 
 ;; https://adventofcode.com/2023/day/1
 
@@ -60,47 +61,12 @@
 ;; (extract-numbers "abc2de")
 ;; => 22
 
+;; Should use `(range 1 10)`
 (def digits-as-strings (map #(-> % inc str) (range 9)))
 (def digit-names ["one" "two" "three" "four" "five" "six" "seven" "eight" "nine"])
 (def number-string-map
   (zipmap digit-names digits-as-strings))
 (def number-name-digit-map (zipmap digit-names (map inc (range 9))))
-
-
-(defn string->num
-  "Replace the number name in string `s` with the number.
-  'eightyone3five' -> '8y135'"
-  [s]
-  (reduce (fn [result [key value]]
-            (str/replace result key value))
-          s
-          number-string-map))
-
-;; (string->num "eightyone3five")
-;; => "8y135"
-
-;;; WRONG - should be 213
-;; (string->num "twone3")
-;; => "2ne3"
-
-;; (mapv extract-numbers inputs-sample-1)
-;; => [12 38 15 77]
-
-;; (apply + (mapv extract-numbers inputs-sample-1))
-;; => 142
-
-#_(defn string->num->extract
-    "Apply both string-> and extract 1st/last to `s`."
-    [s]
-    (-> s
-        string->num
-        extract-numbers))
-
-;; (string->num->extract "eightyone3five")
-;; => 85
-;; => 85
-;; (string->num->extract "twone3five")
-;; => 25
 
 (defn sum-calib-data
   "Sum the calibration data (part 1)."
