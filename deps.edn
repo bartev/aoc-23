@@ -1,0 +1,15 @@
+{:deps
+ {babashka/fs {:mvn/version "0.5.20"}}
+
+ :aliases
+ {:test/cog {:extra-paths ["test"]
+             :extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1", :git/sha "dfb30dd"}}
+             :main-opts ["-m" "cognitect.test-runner"]
+             :exec-fn cognitect.test-runner.api/test}
+
+
+  ;; https://practical.li/blog/posts/clojure-which-execution-option-to-use/
+  :project/run {:main-opts ["-m" "core"]}
+  :outdated {;; Note that it is `:deps`, not `:extra-deps`
+             :deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
+             :main-opts ["-m" "antq.core"]}}}
