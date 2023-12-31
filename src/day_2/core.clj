@@ -35,6 +35,7 @@
 
 (def items ["3 blue" " 4 red" " 7 green"])
 
+;; This could've been done more easily by splitting the string into [n color]
 (defn count-colors [color items]
   (let [col-count (some->> (filter #(str/includes? % color) items)
                            first
@@ -151,6 +152,9 @@ res-1
         max-val (apply max values)]
     {color (or max-val 0)}))
 
+;; Could've been done more simply using
+;; (reduce (partial merge-with max) draws)
+;; => {:red 4, :blue 6, :green 2}
 (defn get-min-cubes
   "For a given set of draws, get the minimum number of cubes of each color"
   [draws]
@@ -180,3 +184,35 @@ res-1
 
 (part2 "input.txt")
 ;; => 63711
+
+
+(def a-draw (first res-1))
+a-draw
+;; => {:id "1",
+;;     :draws ({:blue 3, :red 4} {:blue 6, :green 2, :red 1} {:green 2})}
+
+(get-min-cubes a-draw)
+;; => {:red 4, :green 2, :blue 6, :power 48}
+
+(defn get-min-cubes-simpler
+  "For a given set of draws, get the minimum number of cubes of each color"
+  [draws]
+  (let [min-cubes (reduce (partial merge-with max) (:draws draws))
+        power (* (:red min-cubes) (:green min-cubes) (:blue min-cubes))
+        ;; power ((fn [{:keys [red green blue]}] (* red green blue)) min-cubes)
+        ]
+    (merge min-cubes {:power power})))
+
+(get-min-cubes-simpler a-draw)
+;; => {:blue 6, :red 4, :green 2, :power 48}
+;; => [4 2 6]
+;; => {:blue 6, :red 4, :green 2, :power 48}
+
+;; Destructuring!
+(defn minima [{:keys [red green blue]}]
+  [red green blue])
+
+(get-min-cubes-simpler a-draw)
+;; => {:blue 6, :red 4, :green 2, :power 48}
+(minima (get-min-cubes-simpler a-draw))
+;; => [4 2 6]
