@@ -31,6 +31,7 @@
   [fname]
   (->> (slurp (get-local-fname fname))
        str/split-lines))
+
 (defn get-local-fname
   "Get fname relative to source file."
   [fname]
