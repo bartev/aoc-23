@@ -23,29 +23,6 @@
 ;; ...$.*....
 ;; .664.598..
 
-;; 1. Find numbers.
-;; 2. Find coordinates of numbers (row, columns).
-;; 3. Find symbols (not number, not `.`)
-;; 4. Find coordinates of dots.
-;; 5. Any digit in 8 spots around a symbol?
-;; 5a. yes: Put number in a list.
-;; 5b. no: replace symbol with `.` (or nil?)
-
-
-;; 1. Read file into lines.
-;; 2. Process a line. (line -> numbers-to-keep)
-
-(defn line->numbers-to-keep
-  "Check the line and adjacent line for symbols adjacent to numbers.
-  Save any such numbers to a list."
-  [line prev-line next-line]
-  nil
-  )
-
-;; 3. Process all lines
-;; 4. Sum up lists from all lines
-
-
 (defn read-input [fname]
   (read-file-lines-slurp fname))
 
@@ -63,8 +40,7 @@
 ;;     "...$.*...."
 ;;     ".664.598.."]
 
-(def regex-symbol #"[^0-9.]")
-(def regex-number #"\d+")
+(def regex-symbol #"[^0-9.]")(def regex-number #"\d+")
 
 (defn find-start-indices [s regex]
   (let [matcher (re-matcher regex s)] ; matcher finds all matches
@@ -118,7 +94,7 @@
       (parse-long (:match number-map)))))
 
 (defn check-for-overlaps
-  "Check each number in :numbers for an overlap in :indicdes"
+  "Check each number in :numbers for an overlap in :indices"
   [row-map]
   (let [numbers (:numbers row-map)
         indices (:indices row-map)]
@@ -127,6 +103,7 @@
          (remove nil?)
          vec)))
 
+;; Don't really need `map-indexed`
 (defn part1 [fname]
   (->> (read-input fname) ; Read input file into a vec of strings.
        (map-indexed (fn [idx row] (merge {:row-idx idx} (mapify-row row))))  ; Mapfify each row (find numbers, symbols and indices of each)
@@ -136,9 +113,74 @@
        flatten
        (apply +)
        ))
-;; => #'day-3.core/part1
 
 (part1 fname-sample)
 ;; => 4361
-;; => (467 35 633 617 592 755 664 598)
-;; => ([467] [] [35 633] [] [617] [] [592] [755] [] [664 598])
+
+(part1 "input.txt")
+;; => 532331
+
+
+
+
+
+;;;;; Part 2
+
+;; Gears are `*` that are adjacent to exactly 2 part numbers.
+;; Gear ratio is the product of those 2 numbers.
+
+(defn mapify-row-star
+  "Process each line of the list"
+  [row]
+  {:numbers (find-start-end-indices row regex-number)
+   :stars (find-start-indices row #"\*")})
+
+(defn combine-before-after-numbers
+  "Combine lists of :numbers from prev, current and next row for each row"
+  [row-maps]
+  (map-indexed
+   (fn [idx row]
+     (let [before (get row-maps (dec idx))
+           after (get row-maps (inc idx))
+           before-nums (:numbers before)
+           after-nums (:numbers after)
+           cur-nums (:numbers row)
+           all-nums (concat cur-nums before-nums after-nums)]
+       (merge row {:all-numbers all-nums})
+       {:stars (:stars row)
+        :numbers all-nums}))
+   row-maps))
+
+(defn get-overlapping-numbers
+  "Get all numbers from :numbers that overlap with idx."
+  [numbers idx]
+  (vec (remove nil? (map #(get-number-if-overlap % [idx]) numbers))))
+
+(defn create-gear-map [star-index numbers]
+  (let [overlaps (get-overlapping-numbers numbers star-index)]
+    (when (= 2 (count overlaps))
+      {:gear star-index
+       :product-numbers overlaps
+       :gear-ratio (apply * overlaps)})))
+
+(defn ->gear-maps
+  "Convert row-map to gear maps to the row-map"
+  [row-map]
+  (let [star-indices (:stars row-map)
+        numbers (:numbers row-map)]
+    (map #(create-gear-map % numbers) star-indices)))
+
+(defn part2 [fname]
+  (->> (read-input fname)
+       (mapv mapify-row-star)
+       combine-before-after-numbers
+       (map ->gear-maps)
+       flatten
+       (remove nil?)
+       (map :gear-ratio)
+       (reduce +)
+       ))
+
+(part2 fname-sample)
+(part2 "input.txt")
+;; => 82301120

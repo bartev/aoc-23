@@ -52,51 +52,6 @@
    ".664.598.."]
   )
 
-#_
-(-> sample-inputs
-    (#(map mapify-row %)))
-;; => ({:numbers
-;;      [{:match "467", :start 0, :end 3}
-;;       {:match "114", :start 5, :end 8}],
-;;      :symbols []}
-;;     {:numbers [], :symbols [3]}
-;;     {:numbers
-;;      [{:match "35", :start 2, :end 4} {:match "633", :start 6, :end 9}],
-;;      :symbols []}
-;;     {:numbers [], :symbols [6]}
-;;     {:numbers [{:match "617", :start 0, :end 3}], :symbols [3]}
-;;     {:numbers [{:match "58", :start 7, :end 9}], :symbols [5]}
-;;     {:numbers [{:match "592", :start 2, :end 5}], :symbols []}
-;;     {:numbers [{:match "755", :start 6, :end 9}], :symbols []}
-;;     {:numbers [], :symbols [3 5]}
-;;     {:numbers
-;;      [{:match "664", :start 1, :end 4}
-;;       {:match "598", :start 5, :end 8}],
-;;      :symbols []})
-
-#_
-(let [row-maps (-> sample-inputs
-                   (#(mapv mapify-row %)))]
-  row-maps)
-;; => [{:numbers
-;;      [{:match "467", :start 0, :end 3}
-;;       {:match "114", :start 5, :end 8}],
-;;      :symbols []}
-;;     {:numbers [], :symbols [3]}
-;;     {:numbers
-;;      [{:match "35", :start 2, :end 4} {:match "633", :start 6, :end 9}],
-;;      :symbols []}
-;;     {:numbers [], :symbols [6]}
-;;     {:numbers [{:match "617", :start 0, :end 3}], :symbols [3]}
-;;     {:numbers [{:match "58", :start 7, :end 9}], :symbols [5]}
-;;     {:numbers [{:match "592", :start 2, :end 5}], :symbols []}
-;;     {:numbers [{:match "755", :start 6, :end 9}], :symbols []}
-;;     {:numbers [], :symbols [3 5]}
-;;     {:numbers
-;;      [{:match "664", :start 1, :end 4}
-;;       {:match "598", :start 5, :end 8}],
-;;      :symbols []}]
-
 (deftest combine-before-after-symbol-indices-test
   (let [row-maps (-> sample-inputs
                      (#(mapv mapify-row %)))]
@@ -218,3 +173,39 @@
     ;; No Overlaps
     (is (= []
            (check-for-overlaps {:numbers numbers :indices [10]})))))
+
+;; Part 2
+
+(deftest mapify-row-star-test
+  (is (= {:numbers [] :stars []}
+         (mapify-row-star "")))
+  (is (= {:numbers [] :stars []}
+         (mapify-row-star ".")))
+  (is (= {:numbers [{:match "12" :start 0 :end 2}] :stars []}
+         (mapify-row-star "12")))
+  (is (= {:numbers [] :stars [1]}
+         (mapify-row-star ".*.")))
+  (is (= {:numbers [{:match "12" :start 1 :end 3}
+                    {:match "3" :start 4 :end 5}]
+          :stars [3 5]}
+         (mapify-row-star ".12*3*."))))
+
+(deftest get-overlapping-numbers-test
+  (let [numbers [{:match "467", :start 0, :end 3}
+                 {:match "114", :start 3, :end 5}]]
+    (is (= [467]
+           (get-overlapping-numbers numbers 0)))
+    (is (= [467 114]
+           (get-overlapping-numbers numbers 3)))
+    (is (= [114]
+           (get-overlapping-numbers numbers 5)))))
+
+(deftest create-gear-map-test
+  (let [row-map {:stars [3],
+                 :numbers [{:match "467", :start 0, :end 3}
+                           {:match "35", :start 2, :end 4}
+                           {:match "114", :start 5, :end 8}
+                           {:match "633", :start 6, :end 9}]}]
+    (is (= {:gear 3, :product-numbers [467 35], :gear-ratio 16345}
+           (create-gear-map 3 (:numbers row-map))
+           ))))
