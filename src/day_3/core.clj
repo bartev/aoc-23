@@ -40,7 +40,8 @@
 ;;     "...$.*...."
 ;;     ".664.598.."]
 
-(def regex-symbol #"[^0-9.]")(def regex-number #"\d+")
+(def regex-symbol #"[^0-9.]")
+(def regex-number #"\d+")
 
 (defn find-start-indices [s regex]
   (let [matcher (re-matcher regex s)] ; matcher finds all matches
