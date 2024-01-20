@@ -2,8 +2,8 @@
   (:require
    [clojure.edn :as edn]
    [clojure.string :as str]
-   [utils :refer [read-file-lines-slurp]]
-   ;; [clojure.walk :refer [keywordize-keys]]
+   [utils :refer [extract-digits-as-nums
+                  read-file-lines-slurp]]
    [utils]))
 
 ;; Input map has 3 numbers
@@ -22,14 +22,6 @@
   [dest source len]
   (zipmap (gen-range source len)
           (gen-range dest len)))
-
-(defn extract-digits-as-nums
-  "Extract the digits from a string, and convert to vec of numbers."
-  [x]
-  (->> x
-       (re-seq #"\d+")
-       vec
-       (map edn/read-string)))
 
 (defn str->one-mapping [s]
   "Convert a string with `dest`, `src`, `rng` to a mapping.

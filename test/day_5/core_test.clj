@@ -10,13 +10,7 @@
   (is (= {52 37, 53 38}
          (gen-one-mapping 37 52 2))))
 
-(deftest extract-digits-as-nums-test
-  (is (= [6 12 344]
-         (extract-digits-as-nums " 06 12 344 ")))
-  (is (= [6 12 344]
-         (extract-digits-as-nums " 06 12 foo 344 ")))
-  (is (= [6 12 34 4]
-         (extract-digits-as-nums " 06 12 34.4 "))))
+
 
 (deftest str->one-mapping-test
   (is (= {8 56, 9 57, 10 58}

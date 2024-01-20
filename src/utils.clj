@@ -1,6 +1,7 @@
 (ns utils
   (:require
    [babashka.fs :as fs]
+   [clojure.edn :as edn]
    [clojure.java.io :as io]
    [clojure.string :as str]))
 
@@ -54,3 +55,11 @@
                  (fs/path fname)
                  str)]
     (slurp path)))
+
+(defn extract-digits-as-nums
+  "Extract the digits from a string, and convert to vec of numbers."
+  [x]
+  (->> x
+       (re-seq #"\d+")
+       vec
+       (map edn/read-string)))
