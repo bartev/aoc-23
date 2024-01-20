@@ -6,11 +6,13 @@
 (cp/add-classpath "src:test")
 
 (require 'day-1.core-test
-         'day-3.core-test)
+         'day-3.core-test
+         'day-5.core-test)
 
 (def test-results
   (t/run-tests 'day-1.core-test
-               'day-3.core-test))
+               'day-3.core-test
+               'day-5.core-test))
 
 (println ">>>>>>>>>> BV test results")
 (println test-results)
