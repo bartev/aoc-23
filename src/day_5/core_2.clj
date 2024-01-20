@@ -30,6 +30,7 @@
     {:src-start src-start
      :src-end (+ src-start len)
      :dest-start dest-start
+     :dest-end (+ dest-start len)
      :len len}))
 
 (defn process-map-str
@@ -49,7 +50,7 @@
   (let [[_ src dest ranges] (re-matches pat-map input)]
     {:source src
      :dest dest
-     :ranges (->> (str/split ranges #"\n")
+     :ranges (->> (str/split-lines ranges)
                   (mapv range-str->map)
                   (sort-by :src-start))}))
 
@@ -127,6 +128,12 @@
   "Select the element where the :source field is 'source'."
   [dicts src]
   (->> (filter #(= src (:source %)) dicts)
+       first))
+
+(defn filter-by-dest
+  "Select the element where the :source field is 'source'."
+  [dicts dest]
+  (->> (filter #(= dest (:dest %)) dicts)
        first))
 
 (def tmp-mappings [{:source "seed",
@@ -248,3 +255,141 @@
 
 (part1 "input.txt")
 ;; => 424490994
+
+(def seeds [79 14 55 13])
+;; (partition 2 seeds)
+
+(defn create-range [[start len]]
+  {:start start
+   :end (+ start len)
+   :len len})
+
+;; (create-range [1 7])
+;; => {:start 1, :len 7}
+
+(defn create-seed-ranges
+  "Use the same `seeds` value as before (vec of ints).
+  This time interpret them as starting point + len"
+  [seeds]
+  (let [pairs (partition 2 seeds)
+        ranges (map create-range pairs)]
+    (sort-by :start ranges)))
+
+(create-seed-ranges seeds)
+;; => ({:start 55, :end 68, :len 13} {:start 79, :end 93, :len 14})
+;; => ({:start 55, :len 13} {:start 79, :len 14})
+;; => nil
+
+;; loop over all seed locations in seed range
+
+(defn min-loc-in-range
+  "Get the min :location for seeds in `seed-range`"
+  [mappings seed-range]
+  (let [seed-start (:start seed-range)
+        seed-end (:end seed-range)]
+    (loop [seed seed-start
+           min-loc nil
+           counter 1]
+      (if (>= seed seed-end)
+        min-loc
+        (let [new-loc (:location (seed->all mappings seed))]
+          (when (or (= 1 counter)
+                    (zero? (mod counter 50)))
+            (println "iter:" counter "seed:" seed
+                     "new-loc:" new-loc " min-loc:" min-loc))
+          (recur (inc seed)
+                 (min (or min-loc new-loc) new-loc)
+                 (inc counter)))))))
+
+(min-loc-in-range tmp-mappings {:start 55, :end 68, :len 13})
+;; => 56
+;; => 56
+
+;; REALLY BAD! Iterates over billions(?) of values
+(defn part2
+  "Treat seeds as ranges"
+  [fname]
+  (let [parsed (parse-file fname)
+        seeds (:seeds parsed)
+        seed-ranges (create-seed-ranges seeds)
+        mappings (:mappings parsed)]
+    (->> seed-ranges ; Start with the seed ranges
+         (map #(min-loc-in-range mappings %)) ; Get min loc for a single range
+         (apply min) ; Get min loc of all ranges
+         )))
+
+(part2 "input-sample.txt")
+;; => 46
+
+(part2 "input.txt")
+
+str/split-lines
+
+(defn get-loc-ranges
+  "Get the loc ranges from the mappings. (for working backwards)"
+  [mappings]
+  (let [loc-vec (mappings)])
+  )
+
+(defn part2-backwards
+  "Work backwards through locations - find first loc that maps to a seed"
+  [fname]
+  (let [parsed (parse-file fname)
+        seeds (:seeds parsed)
+        seed-ranges (create-seed-ranges seeds)
+        mappings (:mappings parsed)
+        loc-maps (filter-by-dest mappings "location")
+        ;; loc-ranges (get-loc-ranges mappings)
+        ]
+    loc-maps
+    ))
+
+(defn dest->src
+  "Given a dest value, find the source value and name.
+  Output:
+  {:soil 55}"
+  [mappings src-name src-val]
+  (let [cur-mapping (filter-by-source mappings src-name)
+        dest (:dest cur-mapping)
+        ranges (:ranges cur-mapping)
+        cur-range (first
+                   (filter #(and (<= (:src-start %) src-val)
+                                 (< src-val (:src-end %)))
+                           ranges))
+        dest-val (if (nil? cur-range)
+                   src-val
+                   (let [src-start (:src-start cur-range)
+                         delta (- src-val src-start)
+                         dest-start (:dest-start cur-range)]
+                     (+ dest-start delta)))
+        ]
+    ;; dest-val
+    {(keyword dest) dest-val}
+    ))
+
+(defn seed->all-backwards
+  "Map a seed number through all mappings.
+  Mappings are from source (seed, etc) to dest (soil, etc)"
+  [mappings loc]
+  (let [humid (dest->src mappings "location" loc)]
+
+    [soil (src->dest mappings "seed" seed)
+     fertilizer (src->dest mappings "soil" (:soil soil))
+     water (src->dest mappings "fertilizer" (:fertilizer fertilizer))
+     light (src->dest mappings "water" (:water water))
+     temperature (src->dest mappings "light" (:light light))
+     humidity (src->dest mappings "temperature" (:temperature temperature))
+     location (src->dest mappings "humidity" (:humidity humidity))
+     ]
+    (merge {:seed seed} soil fertilizer water light temperature humidity location)
+    ;; (merge {:seed seed} soil fertilizer water light temperature)
+    ))
+
+(part2-backwards "input-sample.txt")
+;; => {:source "humidity",
+;;     :dest "location",
+;;     :ranges
+;;     ({:src-start 56, :src-end 93, :dest-start 60, :len 37}
+;;      {:src-start 93, :src-end 97, :dest-start 56, :len 4})}
+;; => Execution error (ArityException) at day-5.core-2/part2-backwards (REPL:342).
+;;    Wrong number of args (1) passed to: day-5.core-2/filter-by-dest
