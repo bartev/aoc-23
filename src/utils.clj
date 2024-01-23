@@ -40,11 +40,7 @@
       (fs/path fname)
       str))
 
-(defn read-file-lines
-  "Return a vector of lines from the file?"
-  [fname]
-  (with-open [reader (io/reader fname)]
-    (doall (line-seq reader))))
+
 
 
 ;; Probably won't use this.
