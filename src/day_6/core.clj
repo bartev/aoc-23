@@ -1,20 +1,23 @@
 (ns day-6.core
   (:require
    [clojure.java.io :as io]
-   [utils :refer [get-local-fname]]))
+   [utils :refer [get-local-fname]]
+   [clojure.string :as str]))
 
 
-(def lines (vec (line-seq (io/reader (get-local-fname "input.txt")))))
+(defn get-lines [fname]
+  (vec (line-seq (io/reader (get-local-fname fname)))))
 
 (defn parse
   "Parse file into a list of "
-  [lines]
-  (let [times (mapv parse-long (re-seq #"\d+" (first lines)))
+  [fname]
+  (let [lines (get-lines fname)
+        times (mapv parse-long (re-seq #"\d+" (first lines)))
         distances (mapv parse-long (re-seq #"\d+" (second lines)))
         time-dist-tuples (map vector times distances)]
     (map #(zipmap [:time :dist] %) time-dist-tuples)))
 
-(parse lines)
+(parse "input-sample.txt")
 ;; => ({:time 7, :dist 9} {:time 15, :dist 40} {:time 30, :dist 200})
 
 
@@ -46,7 +49,7 @@
 (calc-extreme-distances {:time 7 :dist 10})
 
 (defn task1 [fname]
-  (->> (vec (line-seq (io/reader (get-local-fname fname))))
+  (->> fname
        parse
        (mapv calc-extreme-distances)
        (mapv count)
@@ -65,3 +68,33 @@
 
 (task1 "input.txt")
 ;; => 1084752
+
+;;;;; task 2
+
+(defn parse2
+  "Parse file into a list of "
+  [fname]
+  (->> (get-lines fname)
+       (map (fn [line] (-> (str/split line #":")
+                           second
+                           (str/replace #"\s*" "")
+                           parse-long)))
+       (zipmap [:time :dist])))
+
+(parse2 "input-sample.txt")
+;; => {:time 71530, :dist 940200}
+
+(parse2 "input.txt")
+;; => {:time 40709879, :dist 215105121471005}
+
+(defn task2 [fname]
+  (->> fname
+       parse2
+       calc-extreme-distances
+       count))
+
+(task2 "input-sample.txt")
+;; => 71503
+
+(task2 "input.txt")
+;; => 28228952
