@@ -1,5 +1,6 @@
 {:deps
- {babashka/fs {:mvn/version "0.5.20"}}
+ {babashka/fs {:mvn/version "0.5.20"}
+  clj-http/clj-http {:mvn/version "3.12.3"}}
 
  :aliases
  {:test/cog {:extra-paths ["test"]
