@@ -1,8 +1,8 @@
 (ns day-6.core
   (:require
    [clojure.java.io :as io]
-   [utils :refer [get-local-fname]]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [utils :refer [get-local-fname]]))
 
 
 (defn get-lines [fname]
