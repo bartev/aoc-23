@@ -4,7 +4,7 @@
   (:require
    [clojure.string :as str]
    [utils :refer [get-local-fname
-                  read-file-lines]]))
+                  read-lines-io]]))
 
 ;; I made this extra complicated!
 
@@ -43,20 +43,22 @@
 ;; fname
 ;; => "/Users/bartev/dev/github/aoc-23/src/day_1/sample-input.txt"
 
-(def inputs-sample-1 (read-file-lines fname-sample-1))
+(def inputs-sample-1 (read-lines-io fname-sample-1))
 
-(def inputs-live (read-file-lines fname-live))
+(def inputs-live (read-lines-io fname-live))
 
 ;; sample-input
 ;; => ("1abc2" "pqr3stu8vwx" "a1b2c3d4e5f" "treb7uchet")
 
 (defn extract-numbers [s]
+  "Extract all numbers from a string, concatenate them and read as a single number"
   (->> s
        (re-seq #"\d")
-       vec
-       (#(conj [(first %) (last %)]))
+       ;; vec
+       ;; (#(conj [(first %) (last %)]))
        (apply str)
-       clojure.edn/read-string))
+       ;; clojure.edn/read-string
+       parse-long))
 
 ;; (extract-numbers "abc2de")
 ;; => 22
@@ -71,7 +73,7 @@
 (defn sum-calib-data
   "Sum the calibration data (part 1)."
   [fname]
-  (let [data (read-file-lines fname)
+  (let [data (read-lines-io fname)
         data-nums (mapv extract-numbers data)]
     (apply + data-nums)))
 
@@ -86,7 +88,7 @@
 ;;; Part 2
 
 (def fname-sample-2 (get-local-fname "sample-input-pt-2.txt"))
-(def sample-input-2 (read-file-lines fname-sample-2))
+(def sample-input-2 (read-lines-io fname-sample-2))
 
 ;; search-for
 
@@ -136,7 +138,7 @@
 (defn sum-calib-data-pt-2
   "Sum the calibration data (part 1)."
   [fname]
-  (let [data (read-file-lines fname)
+  (let [data (read-lines-io fname)
         data-nums (mapv put-it-together data)]
     (apply + data-nums)))
 

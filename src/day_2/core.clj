@@ -3,7 +3,7 @@
    [clojure.edn :as edn]
    [clojure.string :as str]
    [utils :refer [get-local-fname
-                  read-file-lines]]))
+                  read-lines-io]]))
 
 
 ;; Parse data to look like

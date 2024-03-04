@@ -1,6 +1,6 @@
 (ns day-4.core
   (:require
-   [utils :refer [read-file-lines-slurp]]
+   [utils :refer [read-lines-io-slurp]]
    [clojure.string :as str]
    [clojure.edn :as edn]))
 
@@ -15,7 +15,7 @@
 
 ;; Different from `parse-card` below.
 (defn parse-cards [fname]
-  (->> (read-file-lines-slurp fname)
+  (->> (read-lines-io-slurp fname)
        ;; (#(map (fn [line] (str/split line #":")) %))
        (map (fn [x] (-> x
                         (str/split #":")

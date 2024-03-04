@@ -20,7 +20,7 @@
 
 ;; (read-file "sample-input.txt")
 
-(defn read-file-lines
+(defn read-lines-io
   "Read a file line-by-line"
   [fname]
   (with-open [reader (io/reader fname)]

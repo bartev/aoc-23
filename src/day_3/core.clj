@@ -1,6 +1,6 @@
 (ns day-3.core
   (:require
-   [utils :refer [read-file-lines-slurp]]
+   [utils :refer [read-lines-io-slurp]]
    [clojure.string :as str]
    [clojure.edn :as edn]))
 

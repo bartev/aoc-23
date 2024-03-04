@@ -2,17 +2,17 @@
   (:require
    [clojure.string :as str]
    [utils :refer [get-local-fname
-                  read-file-lines]]
+                  read-lines-io]]
    [clojure.java.io :as io]))
 
 ;; This solution is much simpler (at least for part 2)
 ;; https://github.com/nbardiuk/adventofcode/blob/master/2023/src/day01.clj
 
 (def fname-sample-1 (get-local-fname "sample-input.txt"))
-(def inputs-sample-1 (read-file-lines fname-sample-1))
+(def inputs-sample-1 (read-lines-io fname-sample-1))
 
 (def fname-sample-2 (get-local-fname "sample-input-pt-2.txt"))
-(def inputs-sample-2 (read-file-lines fname-sample-2))
+(def inputs-sample-2 (read-lines-io fname-sample-2))
 
 inputs-sample-1
 ;; => ("1abc2" "pqr3stu8vwx" "a1b2c3d4e5f" "treb7uchet")
